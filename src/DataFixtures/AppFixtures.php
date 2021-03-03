@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Classe;
 use App\Entity\Etudiant;
+use App\Entity\Intervenant;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
@@ -12,6 +13,7 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
+        $faker = Faker\Factory::create('fr_FR');
 
         for($i=1; $i<6; $i++) {
             $classe = new Classe();
@@ -20,19 +22,19 @@ class AppFixtures extends Fixture
 
             $manager->persist($classe);
 
-            $this->setEtudiant($classe, $manager);
+            $this->setEtudiant($classe, $manager, $faker);
+
         }
+
+        $this->setIntervenant($manager, $faker);
 
         $manager->flush();
 
     }
 
 
-    private function setEtudiant(Classe $classe, ObjectManager $manager)
+    private function setEtudiant(Classe $classe, ObjectManager $manager, $faker)
     {
-
-        $faker = Faker\Factory::create('fr_FR');
-
         for($i=0; $i<=30; $i++) {
             $etudiant = new Etudiant();
 
@@ -44,6 +46,21 @@ class AppFixtures extends Fixture
 
             $manager->persist($etudiant);
 
+        }
+    }
+
+    private function setIntervenant(ObjectManager $manager, $faker)
+    {
+
+        $faker = Faker\Factory::create('fr_FR');
+
+        for($i=1; $i<=20; $i++) {
+            $intervenant = new Intervenant();
+            $intervenant->setNom($faker->name);
+            $intervenant->setPrenom($faker->firstName);
+            $intervenant->setAnnee(new \DateTime());
+
+            $manager->persist($intervenant);
         }
     }
 }

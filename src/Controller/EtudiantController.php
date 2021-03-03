@@ -10,7 +10,6 @@ use Doctrine\Persistence\ObjectRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -68,6 +67,11 @@ class EtudiantController extends AbstractController
     public function getEtudiant(int $id): JsonResponse
     {
         $etudiant = $this->etudiantRepository->find($id);
+
+        if(!$etudiant instanceof Etudiant) {
+            throw new NotFoundHttpException('Etudiant introuvable');
+        }
+
         $json = $this->serialize->serialize($etudiant, 'json', ['groups' => ['etudiant']]);
 
         return JsonResponse::fromJsonString($json, 200);
