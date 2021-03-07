@@ -53,7 +53,13 @@ class IntervenantController extends AbstractController
     public function getIntervenants(): JsonResponse
     {
         $intervenants = $this->intervenantRepository->findAll();
-        return $this->json($intervenants);
+        $json = $this->serialize->serialize($intervenants, 'json', [
+            //'groups' => ['']
+            'circular_reference_handler' => function ($object) {
+                return $object;
+            },
+        ]);
+        return JsonResponse::fromJsonString($json);
     }
 
     /**
@@ -69,7 +75,13 @@ class IntervenantController extends AbstractController
             throw new NotFoundHttpException('Intervenant introuvable');
         }
 
-        return $this->json($intervenant);
+        $json = $this->serialize->serialize($intervenant, 'json', [
+            //'groups' => ['intervenant']
+            'circular_reference_handler' => function ($object) {
+                return $object;
+            },
+        ]);
+        return JsonResponse::fromJsonString($json);
     }
 
     /**

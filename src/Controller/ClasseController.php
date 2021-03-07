@@ -64,6 +64,9 @@ class ClasseController extends AbstractController
     public function getClasse(int $id): JsonResponse
     {
         $classe = $this->classeRepository->find($id);
+        if(!$classe instanceof Classe){
+            throw new NotFoundHttpException('Classe introuvable');
+        }
         $json = $this->serialize->serialize($classe, 'json', ['groups' => ['classe']]);
         return JsonResponse::fromJsonString($json, 200);
     }
@@ -75,6 +78,9 @@ class ClasseController extends AbstractController
     public function getClasseWithEtudiant(int $id): Response
     {
         $classe = $this->classeRepository->find($id);
+        if(!$classe instanceof Classe){
+            throw new NotFoundHttpException('Classe introuvable');
+        }
         $json = $this->serialize->serialize($classe, 'json', ['groups' => ['classe', 'classe_etudiants', 'etudiant']]);
         return JsonResponse::fromJsonString($json, 200);
     }

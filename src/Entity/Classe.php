@@ -39,9 +39,16 @@ class Classe
      */
     private $etudiants;
 
+    /**
+     * @Groups({"matiere_intervenant"})
+     * @ORM\OneToMany(targetEntity=Matiere::class, mappedBy="classe", orphanRemoval=true)
+     */
+    private $matieres;
+
     public function __construct()
     {
         $this->etudiants = new ArrayCollection();
+        $this->matieres = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -97,6 +104,36 @@ class Classe
             // set the owning side to null (unless already changed)
             if ($etudiant->getPromotion() === $this) {
                 $etudiant->setPromotion(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Matiere[]
+     */
+    public function getMatieres(): Collection
+    {
+        return $this->matieres;
+    }
+
+    public function addMatiere(Matiere $matiere): self
+    {
+        if (!$this->matieres->contains($matiere)) {
+            $this->matieres[] = $matiere;
+            $matiere->setClasse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMatiere(Matiere $matiere): self
+    {
+        if ($this->matieres->removeElement($matiere)) {
+            // set the owning side to null (unless already changed)
+            if ($matiere->getClasse() === $this) {
+                $matiere->setClasse(null);
             }
         }
 
