@@ -3,8 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\EtudiantRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 /**
  * @ORM\Entity(repositoryClass=EtudiantRepository::class)
@@ -12,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Etudiant
 {
     /**
-     * @Groups({"etudiant"})
+     * @Serializer\Groups({"etudiant"})
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -20,35 +24,46 @@ class Etudiant
     private $id;
 
     /**
-     * @Groups({"etudiant"})
+     * @Serializer\Groups({"etudiant"})
      * @ORM\Column(type="string", length=255)
      */
     private $nom;
 
     /**
-     * @Groups({"etudiant"})
+     * @Serializer\Groups({"etudiant"})
      * @ORM\Column(type="string", length=255)
      */
     private $prenom;
 
     /**
-     * @Groups({"etudiant"})
+     * @Serializer\Groups({"etudiant"})
      * @ORM\Column(type="integer")
      */
     private $age;
 
     /**
-     * @Groups({"etudiant"})
+     * @Serializer\Groups({"etudiant"})
      * @ORM\Column(type="date")
      */
     private $annee;
 
     /**
-     * @Groups({"classe_information"})
+     * @Serializer\Groups({"etudiant_classe"})
      * @ORM\ManyToOne(targetEntity=Classe::class, inversedBy="etudiants")
      * @ORM\JoinColumn(nullable=false)
      */
     private $promotion;
+
+    /**
+     * @Serializer\Groups({"etudiant_note"})
+     * @ORM\OneToMany(targetEntity=Note::class, mappedBy="etudiant", orphanRemoval=true)
+     */
+    private $notes;
+
+    public function __construct()
+    {
+        $this->notes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -111,6 +126,36 @@ class Etudiant
     public function setPromotion(?Classe $promotion): self
     {
         $this->promotion = $promotion;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Note[]
+     */
+    public function getNotes(): Collection
+    {
+        return $this->notes;
+    }
+
+    public function addNote(Note $note): self
+    {
+        if (!$this->notes->contains($note)) {
+            $this->notes[] = $note;
+            $note->setEtudiant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNote(Note $note): self
+    {
+        if ($this->notes->removeElement($note)) {
+            // set the owning side to null (unless already changed)
+            if ($note->getEtudiant() === $this) {
+                $note->setEtudiant(null);
+            }
+        }
 
         return $this;
     }

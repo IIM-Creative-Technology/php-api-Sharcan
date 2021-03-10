@@ -49,3 +49,4 @@ security:
         - { path: ^/api/etudiant, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/intervenant, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/matiere, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/note, roles: IS_AUTHENTICATED_FULLY }

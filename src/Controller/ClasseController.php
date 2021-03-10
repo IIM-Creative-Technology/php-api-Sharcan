@@ -5,18 +5,19 @@ namespace App\Controller;
 use App\Entity\Classe;
 use App\Form\ClasseType;
 use Doctrine\ORM\EntityManagerInterface;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @Route("/api/classe")
  */
-class ClasseController extends AbstractController
+class ClasseController extends BaseController
 {
 
     /**
@@ -30,30 +31,27 @@ class ClasseController extends AbstractController
     private $classeRepository;
 
     /**
-     * @var SerializerInterface
-     */
-    private $serialize;
-
-    /**
      * ClasseController constructor.
      * @param EntityManagerInterface $entityManager
-     * @param SerializerInterface $serializer
      */
-    public function __construct(EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->classeRepository = $entityManager->getRepository(Classe::class);
         $this->entityManager = $entityManager;
-        $this->serialize = $serializer;
     }
 
     /**
      * @Route("/", name="get_classes", methods={"GET"})
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
      */
-    public function getClasses(): JsonResponse
+    public function getClasses(serializerInterface $serializer): JsonResponse
     {
+
         $classes = $this->classeRepository->findAll();
-        $json = $this->serialize->serialize($classes, 'json', ['groups' => ['classe']]);
-        return JsonResponse::fromJsonString($json, 200);
+        $context = SerializationContext::create()->setGroups(['classe']);
+        $classes = $serializer->serialize($classes, 'json', $context);
+        return JsonResponse::fromJsonString($classes, 200);
     }
 
     /**
@@ -61,28 +59,32 @@ class ClasseController extends AbstractController
      * @param int $id
      * @return JsonResponse
      */
-    public function getClasse(int $id): JsonResponse
+    public function getClasse(int $id, serializerInterface $serializer): JsonResponse
     {
         $classe = $this->classeRepository->find($id);
         if(!$classe instanceof Classe){
             throw new NotFoundHttpException('Classe introuvable');
         }
-        $json = $this->serialize->serialize($classe, 'json', ['groups' => ['classe']]);
-        return JsonResponse::fromJsonString($json, 200);
+
+        $context = SerializationContext::create()->setGroups(['classe']);
+        $classe = $serializer->serialize($classe, 'json', $context);
+        return JsonResponse::fromJsonString($classe, 200);
     }
 
 
     /**
      * @Route("/{id}/etudiant", name="get_classe_by_id_with_student", methods={"GET"})
      */
-    public function getClasseWithEtudiant(int $id): Response
+    public function getClasseWithEtudiant(int $id, serializerInterface $serializer): Response
     {
         $classe = $this->classeRepository->find($id);
         if(!$classe instanceof Classe){
             throw new NotFoundHttpException('Classe introuvable');
         }
-        $json = $this->serialize->serialize($classe, 'json', ['groups' => ['classe', 'classe_etudiants', 'etudiant']]);
-        return JsonResponse::fromJsonString($json, 200);
+
+        $context = SerializationContext::create()->setGroups(['classe', 'classe_etudiant', 'etudiant']);
+        $classe = $serializer->serialize($classe, 'json', $context);
+        return JsonResponse::fromJsonString($classe, 200);
     }
 
     /**
@@ -105,7 +107,7 @@ class ClasseController extends AbstractController
     /**
      * @Route("/{id}", name="remove_classe_by_id", methods={"DELETE"})
      * @param $id
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function deleteClasse(int $id){
         $classe = $this->classeRepository->find($id);
@@ -124,7 +126,7 @@ class ClasseController extends AbstractController
      * @Route("/{id}", name="update_classe_by_id", methods={"PUT"})
      * @param $id
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      * @throws \Exception
      */
     public function updateClasse(int $id, Request $request) {

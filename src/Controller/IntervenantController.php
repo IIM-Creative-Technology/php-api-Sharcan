@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use App\Entity\Intervenant;
 use App\Repository\IntervenantRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,7 +14,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
 
 /**
@@ -38,36 +39,34 @@ class IntervenantController extends AbstractController
     /**
      * ClasseController constructor.
      * @param EntityManagerInterface $entityManager
-     * @param SerializerInterface $serializer
      */
-    public function __construct(EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->intervenantRepository = $entityManager->getRepository(Intervenant::class);
         $this->entityManager = $entityManager;
-        $this->serialize = $serializer;
     }
 
     /**
      * @Route("/", name="get_intervenant", methods={"GET"})
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
      */
-    public function getIntervenants(): JsonResponse
+    public function getIntervenants(SerializerInterface $serializer): JsonResponse
     {
         $intervenants = $this->intervenantRepository->findAll();
-        $json = $this->serialize->serialize($intervenants, 'json', [
-            //'groups' => ['']
-            'circular_reference_handler' => function ($object) {
-                return $object;
-            },
-        ]);
-        return JsonResponse::fromJsonString($json);
+        $context = SerializationContext::create()->setGroups(['intervenant']);
+        $intervenants = $serializer->serialize($intervenants, 'json', $context);
+
+        return JsonResponse::fromJsonString($intervenants, 200);
     }
 
     /**
      * @Route("/{id}", name="get_intervenant_by_id", methods={"GET"})
      * @param int $id
+     * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function getIntervenant(int $id): JsonResponse
+    public function getIntervenant(int $id, SerializerInterface $serializer): JsonResponse
     {
         $intervenant = $this->intervenantRepository->find($id);
 
@@ -75,13 +74,11 @@ class IntervenantController extends AbstractController
             throw new NotFoundHttpException('Intervenant introuvable');
         }
 
-        $json = $this->serialize->serialize($intervenant, 'json', [
-            //'groups' => ['intervenant']
-            'circular_reference_handler' => function ($object) {
-                return $object;
-            },
-        ]);
-        return JsonResponse::fromJsonString($json);
+
+        $context = SerializationContext::create()->setGroups(['intervenant', 'intervenant_matiere', 'matiere']);
+        $intervenant = $serializer->serialize($intervenant, 'json', $context);
+
+        return JsonResponse::fromJsonString($intervenant, 200);
     }
 
     /**

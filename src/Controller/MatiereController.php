@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use App\Entity\Classe;
 use App\Entity\Intervenant;
 use App\Entity\Matiere;
@@ -11,10 +14,8 @@ use Doctrine\Persistence\ObjectRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @Route("/api/matiere")
@@ -33,54 +34,45 @@ class MatiereController extends AbstractController
     private $matiereRepository;
 
     /**
-     * @var SerializerInterface
-     */
-    private $serialize;
-
-    /**
      * ClasseController constructor.
      * @param EntityManagerInterface $entityManager
-     * @param SerializerInterface $serializer
      */
-    public function __construct(EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->matiereRepository = $entityManager->getRepository(Matiere::class);
         $this->entityManager = $entityManager;
-        $this->serialize = $serializer;
     }
 
     /**
      * @Route("/", name="get_matiere", methods={"GET"})
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
      */
-    public function getMatieres(): JsonResponse
+    public function getMatieres(SerializerInterface $serializer): JsonResponse
     {
         $matieres = $this->matiereRepository->findAll();
-         $json = $this->serialize->serialize($matieres, 'json', [
-            'circular_reference_handler' => function ($object) {
-                return $object->getId();
-            },
-        ]);
-         return JsonResponse::fromJsonString($json);
+        $context = SerializationContext::create()->setGroups(['matiere']);
+        $matieres = $serializer->serialize($matieres, 'json', $context);
+
+        return JsonResponse::fromJsonString($matieres, 200);
     }
 
     /**
      * @Route("/{id}", name="get_matiere_by_id", methods={"GET"})
      * @param int $id
+     * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function getMatiere(int $id): JsonResponse
+    public function getMatiere(int $id, SerializerInterface $serializer): JsonResponse
     {
         $matiere = $this->matiereRepository->find($id);
         if(!$matiere instanceof Matiere) {
             throw new NotFoundHttpException('Matière introuvable');
         }
-        $json = $this->serialize->serialize($matiere, 'json', [
-            'circular_reference_handler' => function ($object) {
-                return $object->getId();
-            },
-        ]);
+        $context = SerializationContext::create()->setGroups(['matiere', 'matiere_classe', 'classe', 'matiere_intervenant', 'intervenant']);
+        $matiere = $serializer->serialize($matiere, 'json', $context);
 
-        return JsonResponse::fromJsonString($json, 200);
+        return JsonResponse::fromJsonString($matiere, 200);
     }
 
     /**

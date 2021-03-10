@@ -6,6 +6,7 @@ use App\Repository\ClasseRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -14,34 +15,34 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Classe
 {
     /**
-     * @Groups({"classe"})
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Serializer\Groups({"classe"})
      */
     private $id;
 
     /**
-     * @Groups({"classe"})
      * @ORM\Column(type="string", length=255)
+     * @Serializer\Groups({"classe"})
      */
     private $name;
 
     /**
-     * @Groups({"classe"})
      * @ORM\Column(type="date")
+     * @Serializer\Groups({"classe"})
      */
     private $annee;
 
     /**
-     * @Groups({"classe_etudiants"})
      * @ORM\OneToMany(targetEntity=Etudiant::class, mappedBy="promotion", orphanRemoval=true)
+     * @Serializer\Groups({"classe_etudiant"})
      */
     private $etudiants;
 
     /**
-     * @Groups({"matiere_intervenant"})
      * @ORM\OneToMany(targetEntity=Matiere::class, mappedBy="classe", orphanRemoval=true)
+     * @Serializer\Groups({"classe_matiere"})
      */
     private $matieres;
 

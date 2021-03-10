@@ -6,6 +6,7 @@ use App\Repository\IntervenantRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -14,7 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Intervenant
 {
     /**
-     * @Groups({"intervenant"})
+     * @Serializer\Groups({"intervenant"})
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -22,25 +23,25 @@ class Intervenant
     private $id;
 
     /**
-     * @Groups({"intervenant"})
+     * @Serializer\Groups({"intervenant"})
      * @ORM\Column(type="string", length=255)
      */
     private $nom;
 
     /**
-     * @Groups({"intervenant"})
+     * @Serializer\Groups({"intervenant"})
      * @ORM\Column(type="string", length=255)
      */
     private $prenom;
 
     /**
-     * @Groups({"intervenant"})
+     * @Serializer\Groups({"intervenant"})
      * @ORM\Column(type="date")
      */
     private $annee;
 
     /**
-     * @Groups({"matiere_intervenant"})
+     * @Serializer\Groups({"intervenant_matiere"})
      * @ORM\OneToMany(targetEntity=Matiere::class, mappedBy="intervenant", orphanRemoval=true)
      */
     private $matieres;

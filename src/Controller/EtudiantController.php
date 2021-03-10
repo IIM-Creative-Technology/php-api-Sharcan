@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use App\Entity\Classe;
 use App\Entity\Etudiant;
 use App\Repository\EtudiantRepository;
@@ -12,7 +15,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @Route("/api/etudiant")
@@ -37,44 +39,44 @@ class EtudiantController extends AbstractController
     /**
      * ClasseController constructor.
      * @param EntityManagerInterface $entityManager
-     * @param SerializerInterface $serializer
      */
-    public function __construct(EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->etudiantRepository = $entityManager->getRepository(Etudiant::class);
         $this->entityManager = $entityManager;
-        $this->serialize = $serializer;
     }
 
     /**
      * @Route("/", name="get_etudiants", methods={"GET"})
+     * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function getEtudiants(): JsonResponse
+    public function getEtudiants(SerializerInterface $serializer): JsonResponse
     {
         $etudiants = $this->etudiantRepository->findAll();
+        $context = SerializationContext::create()->setGroups(['etudiant']);
+        $etudiants = $serializer->serialize($etudiants, 'json', $context);
 
-        $json = $this->serialize->serialize($etudiants, 'json', ['groups' => ['etudiant', 'classe_information']]);
-
-        return JsonResponse::fromJsonString($json, 200);
+        return JsonResponse::fromJsonString($etudiants, 200);
     }
 
     /**
      * @Route("/{id}", name="get_etudiant", methods={"GET"})
      * @param int $id
+     * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function getEtudiant(int $id): JsonResponse
+    public function getEtudiant(int $id, SerializerInterface $serializer): JsonResponse
     {
         $etudiant = $this->etudiantRepository->find($id);
 
         if(!$etudiant instanceof Etudiant) {
             throw new NotFoundHttpException('Etudiant introuvable');
         }
+        $context = SerializationContext::create()->setGroups(['etudiant', 'etudiant_note', 'note']);
+        $etudiant = $serializer->serialize($etudiant, 'json', $context);
 
-        $json = $this->serialize->serialize($etudiant, 'json', ['groups' => ['etudiant']]);
-
-        return JsonResponse::fromJsonString($json, 200);
+        return JsonResponse::fromJsonString($etudiant, 200);
     }
 
     /**
