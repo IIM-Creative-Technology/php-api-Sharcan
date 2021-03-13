@@ -97,6 +97,17 @@ Pour accéder aux requêtes ci-dessous il faut **obligatoirement** avoir un Toke
 * Pour se faire, l'url `http://localhost:8000/api/login/` est disponible en méthode **POST**
     * email disponible : *Karine@devinci.fr*, *Alexis@devinci.fr*, *Nicolas@devinci.fr*
     * password : "password"
+    
+Réponse retour :
+
+```json
+{
+  "token": "string"
+}
+```
+
+Il faut ensuite ensuite pour chaque requête rajouter dans le header le Paramètre :
+`Authorization: Bearer {token}`
 
 Chaque entité peut être:
 * Récupérée par l'url suivante (en méthode **"GET"**):  
@@ -115,6 +126,52 @@ Il est possible de rajouter l'id pour récupérer une donnée précise
   `http://localhost:8000/api/{NomEntite}/{id}`
     * En ajoutant les variables qui correspondent dans le body.
 
+
+### Propriété pour chaque entité:
+
+* Classe :
+```json
+{
+  "name": "string",
+  "annee": "string"
+}
+```
+* Etudiant :
+```json
+{
+  "nom": "string",
+  "prenom": "string",
+  "age": 0,
+  "annee": "string",
+  "classe_id": 0
+}
+```
+* Intervenant :
+```json
+{
+  "nom": "string",
+  "prenom": "string",
+  "annee": "string"
+}
+```
+* Matiere :
+```json
+{
+  "nom": "string",
+  "debut": "string",
+  "fin": "string",
+  "classe": 0,
+  "intervenant": 0
+}
+```
+* Note :
+```json
+{
+  "note": 0,
+  "etudiant": 0,
+  "matiere": 0
+}
+```
 ---
 
 Nicolas Brazzolotto *dit* Sharcan.
