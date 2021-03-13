@@ -36,13 +36,20 @@ class NoteController extends AbstractController
     private $noteRepository;
 
     /**
-     * ClasseController constructor.
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
+     * NoteController constructor.
      * @param EntityManagerInterface $entityManager
+     * @param SerializerInterface $serializer
      */
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
         $this->noteRepository = $this->entityManager->getRepository(Note::class);
+        $this->serializer = $serializer;
     }
 
     /**
@@ -51,11 +58,11 @@ class NoteController extends AbstractController
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function getNotes(SerializerInterface $serializer): JsonResponse
+    public function getNotes(): JsonResponse
     {
         $notes = $this->noteRepository->findAll();
         $context = SerializationContext::create()->setGroups(['note']);
-        $notes = $serializer->serialize($notes, 'json', $context);
+        $notes = $this->serializer->serialize($notes, 'json', $context);
 
         return JsonResponse::fromJsonString($notes, 200);
 
@@ -68,11 +75,11 @@ class NoteController extends AbstractController
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function getNote(int $id, SerializerInterface $serializer): JsonResponse
+    public function getNote(int $id): JsonResponse
     {
         $note = $this->noteRepository->find($id);
         $context = SerializationContext::create()->setGroups(['note', 'note_etudiant', 'etudiant', 'note_matiere', 'matiere']);
-        $note = $serializer->serialize($note, 'json', $context);
+        $note = $this->serializer->serialize($note, 'json', $context);
 
         return JsonResponse::fromJsonString($note, 200);
 

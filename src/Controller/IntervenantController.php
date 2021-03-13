@@ -37,29 +37,30 @@ class IntervenantController extends AbstractController
     /**
      * @var SerializerInterface
      */
-    private $serialize;
+    private $serializer;
 
     /**
-     * ClasseController constructor.
+     * IntervenantController constructor.
      * @param EntityManagerInterface $entityManager
+     * @param SerializerInterface $serializer
      */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, serializerInterface $serializer)
     {
         $this->intervenantRepository = $entityManager->getRepository(Intervenant::class);
         $this->entityManager = $entityManager;
+        $this->serializer = $serializer;
     }
 
     /**
      * @Route("/", name="get_intervenant", methods={"GET"})
      * @OA\Tag(name="Intervenant")
-     * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function getIntervenants(SerializerInterface $serializer): JsonResponse
+    public function getIntervenants(): JsonResponse
     {
         $intervenants = $this->intervenantRepository->findAll();
         $context = SerializationContext::create()->setGroups(['intervenant']);
-        $intervenants = $serializer->serialize($intervenants, 'json', $context);
+        $intervenants = $this->serializer->serialize($intervenants, 'json', $context);
 
         return JsonResponse::fromJsonString($intervenants, 200);
     }
@@ -68,10 +69,9 @@ class IntervenantController extends AbstractController
      * @Route("/{id}", name="get_intervenant_by_id", methods={"GET"})
      * @OA\Tag(name="Intervenant")
      * @param int $id
-     * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function getIntervenant(int $id, SerializerInterface $serializer): JsonResponse
+    public function getIntervenant(int $id): JsonResponse
     {
         $intervenant = $this->intervenantRepository->find($id);
 
@@ -81,7 +81,7 @@ class IntervenantController extends AbstractController
 
 
         $context = SerializationContext::create()->setGroups(['intervenant', 'intervenant_matiere', 'matiere']);
-        $intervenant = $serializer->serialize($intervenant, 'json', $context);
+        $intervenant = $this->serializer->serialize($intervenant, 'json', $context);
 
         return JsonResponse::fromJsonString($intervenant, 200);
     }

@@ -37,16 +37,21 @@ class EtudiantController extends AbstractController
     /**
      * @var SerializerInterface
      */
-    private $serialize;
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
 
     /**
-     * ClasseController constructor.
+     * EtudiantController constructor.
      * @param EntityManagerInterface $entityManager
+     * @param SerializerInterface $serializer
      */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, serializerInterface $serializer)
     {
         $this->etudiantRepository = $entityManager->getRepository(Etudiant::class);
         $this->entityManager = $entityManager;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -55,11 +60,11 @@ class EtudiantController extends AbstractController
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function getEtudiants(SerializerInterface $serializer): JsonResponse
+    public function getEtudiants(): JsonResponse
     {
         $etudiants = $this->etudiantRepository->findAll();
         $context = SerializationContext::create()->setGroups(['etudiant']);
-        $etudiants = $serializer->serialize($etudiants, 'json', $context);
+        $etudiants = $this->serializer->serialize($etudiants, 'json', $context);
 
         return JsonResponse::fromJsonString($etudiants, 200);
     }
@@ -71,7 +76,7 @@ class EtudiantController extends AbstractController
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function getEtudiant(int $id, SerializerInterface $serializer): JsonResponse
+    public function getEtudiant(int $id): JsonResponse
     {
         $etudiant = $this->etudiantRepository->find($id);
 
@@ -79,7 +84,7 @@ class EtudiantController extends AbstractController
             throw new NotFoundHttpException('Etudiant introuvable');
         }
         $context = SerializationContext::create()->setGroups(['etudiant', 'etudiant_note', 'note', 'note_matiere', 'matiere']);
-        $etudiant = $serializer->serialize($etudiant, 'json', $context);
+        $etudiant = $this->serializer->serialize($etudiant, 'json', $context);
 
         return JsonResponse::fromJsonString($etudiant, 200);
     }

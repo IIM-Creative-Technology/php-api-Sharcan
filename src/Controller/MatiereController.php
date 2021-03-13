@@ -37,26 +37,32 @@ class MatiereController extends AbstractController
     private $matiereRepository;
 
     /**
-     * ClasseController constructor.
-     * @param EntityManagerInterface $entityManager
+     * @var SerializerInterface
      */
-    public function __construct(EntityManagerInterface $entityManager)
+    private $serializer;
+
+    /**
+     * MatiereController constructor.
+     * @param EntityManagerInterface $entityManager
+     * @param SerializerInterface $serializer
+     */
+    public function __construct(EntityManagerInterface $entityManager, serializerInterface $serializer)
     {
         $this->matiereRepository = $entityManager->getRepository(Matiere::class);
         $this->entityManager = $entityManager;
+        $this->serializer = $serializer;
     }
 
     /**
      * @Route("/", name="get_matiere", methods={"GET"})
      * @OA\Tag(name="Matiere")
-     * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function getMatieres(SerializerInterface $serializer): JsonResponse
+    public function getMatieres(): JsonResponse
     {
         $matieres = $this->matiereRepository->findAll();
         $context = SerializationContext::create()->setGroups(['matiere']);
-        $matieres = $serializer->serialize($matieres, 'json', $context);
+        $matieres = $this->serializer->serialize($matieres, 'json', $context);
 
         return JsonResponse::fromJsonString($matieres, 200);
     }
@@ -65,17 +71,16 @@ class MatiereController extends AbstractController
      * @Route("/{id}", name="get_matiere_by_id", methods={"GET"})
      * @OA\Tag(name="Matiere")
      * @param int $id
-     * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function getMatiere(int $id, SerializerInterface $serializer): JsonResponse
+    public function getMatiere(int $id): JsonResponse
     {
         $matiere = $this->matiereRepository->find($id);
         if(!$matiere instanceof Matiere) {
             throw new NotFoundHttpException('Matière introuvable');
         }
         $context = SerializationContext::create()->setGroups(['matiere', 'matiere_classe', 'classe', 'matiere_intervenant', 'intervenant']);
-        $matiere = $serializer->serialize($matiere, 'json', $context);
+        $matiere = $this->serializer->serialize($matiere, 'json', $context);
 
         return JsonResponse::fromJsonString($matiere, 200);
     }

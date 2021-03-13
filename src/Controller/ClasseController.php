@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Classe;
-use App\Form\ClasseType;
 use App\Repository\ClasseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
@@ -17,13 +16,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
 
 /**
  * @Route("/api/classe")
  */
-class ClasseController extends BaseController
+class ClasseController extends AbstractController
 {
 
     /**
@@ -37,13 +35,20 @@ class ClasseController extends BaseController
     private $classeRepository;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * ClasseController constructor.
      * @param EntityManagerInterface $entityManager
+     * @param SerializerInterface $serializer
      */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, serializerInterface $serializer)
     {
         $this->classeRepository = $entityManager->getRepository(Classe::class);
         $this->entityManager = $entityManager;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -54,15 +59,14 @@ class ClasseController extends BaseController
      *     description="Classe response",
      *     @OA\JsonContent(ref=@Model(type=Classe::class))
      * )
-     * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function getClasses(serializerInterface $serializer): JsonResponse
+    public function getClasses(): JsonResponse
     {
 
         $classes = $this->classeRepository->findAll();
         $context = SerializationContext::create()->setGroups(['classe']);
-        $classes = $serializer->serialize($classes, 'json', $context);
+        $classes = $this->serializer->serialize($classes, 'json', $context);
         return JsonResponse::fromJsonString($classes, 200);
     }
 
@@ -72,7 +76,7 @@ class ClasseController extends BaseController
      * @param int $id
      * @return JsonResponse
      */
-    public function getClasse(int $id, serializerInterface $serializer): JsonResponse
+    public function getClasse(int $id): JsonResponse
     {
         $classe = $this->classeRepository->find($id);
         if(!$classe instanceof Classe){
@@ -80,7 +84,7 @@ class ClasseController extends BaseController
         }
 
         $context = SerializationContext::create()->setGroups(['classe']);
-        $classe = $serializer->serialize($classe, 'json', $context);
+        $classe = $this->serializer->serialize($classe, 'json', $context);
         return JsonResponse::fromJsonString($classe, 200);
     }
 
@@ -92,7 +96,7 @@ class ClasseController extends BaseController
      * @param SerializerInterface $serializer
      * @return Response
      */
-    public function getClasseWithEtudiant(int $id, serializerInterface $serializer): Response
+    public function getClasseWithEtudiant(int $id): Response
     {
         $classe = $this->classeRepository->find($id);
         if(!$classe instanceof Classe){
@@ -100,7 +104,7 @@ class ClasseController extends BaseController
         }
 
         $context = SerializationContext::create()->setGroups(['classe', 'classe_etudiant', 'etudiant']);
-        $classe = $serializer->serialize($classe, 'json', $context);
+        $classe = $this->serializer->serialize($classe, 'json', $context);
         return JsonResponse::fromJsonString($classe, 200);
     }
 
