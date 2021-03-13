@@ -58,7 +58,11 @@ Nous venons de créer et peupler différentes entités, qui sont:
 ### Installation de JWT
 
 Enfin il faut rajouter les fichiers de configuration du package JWT.
-Pour se faire, executer la commande suivante à la racine du projet:
+Pour se faire, il faut créer un dossier jwt dans le dossier config du projet :
+```bash
+mkdir config/jwt
+```
+Executer la commande suivante à la racine du projet:
 ```bash
 openssl genrsa -out config/jwt/private.pem -aes256 4096
 ```
@@ -71,6 +75,12 @@ openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
 Indiquer le même mot de passe.
 
 Retourner dans le fichier `.env.local` et mettre le mot de passe indiquer avant sur la ligne **JWT_PASSPHRASE**
+
+##Lancement
+Le projet est enfin prêt à être lancé:
+```bash
+symfony server:start
+```
 
 ---
 
