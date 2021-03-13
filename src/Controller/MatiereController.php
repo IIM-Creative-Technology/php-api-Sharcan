@@ -107,8 +107,8 @@ class MatiereController extends AbstractController
         $endDate = new \DateTime($request->request->get('fin'));
 
         $interval = $endDate->diff($startDate);
-        if($interval->d > 5) {
-            throw new \Exception("L'intervale des dates ne peut dépasser 5 jours");
+        if($interval->d < 1 || $interval->d > 5) {
+            throw new \Exception("L'intervale des dates doit être comprise en 1 et 5 jours");
         }
 
 
@@ -152,6 +152,14 @@ class MatiereController extends AbstractController
         }
         if(!$intervenant instanceof Intervenant) {
             throw new NotFoundHttpException('Intervenant introuvable');
+        }
+
+        $startDate = new \DateTime($request->request->get('debut'));
+        $endDate = new \DateTime($request->request->get('fin'));
+
+        $interval = $endDate->diff($startDate);
+        if($interval->d < 1 || $interval->d > 5) {
+            throw new \Exception("L'intervale des dates doit être comprise en 1 et 5 jours");
         }
 
         $matiere->setNom($request->request->get('nom'));

@@ -100,8 +100,8 @@ class NoteController extends AbstractController
         if(!$etudiant instanceof Etudiant) {
             throw new NotFoundHttpException('Etudiant introuvable');
         }
-        if($request->request->get('note') > 20) {
-            throw new \InvalidArgumentException('La note ne peut exéder 20.');
+        if($request->request->get('note') < 0 || $request->request->get('note') > 20) {
+            throw new \InvalidArgumentException('La note doit être comprise entre 0 et 20.');
         }
 
         $note = new Note();
@@ -141,8 +141,8 @@ class NoteController extends AbstractController
         if(!$etudiant instanceof Etudiant) {
             throw new NotFoundHttpException('Etudiant introuvable');
         }
-        if($request->request->get('note') > 20) {
-            throw new \InvalidArgumentException('La note ne peut exéder 20.');
+        if($request->request->get('note') < 0 || $request->request->get('note') > 20) {
+            throw new \InvalidArgumentException('La note doit être comprise entre 0 et 20.');
         }
 
         $note->setNote($request->request->get('note'));
