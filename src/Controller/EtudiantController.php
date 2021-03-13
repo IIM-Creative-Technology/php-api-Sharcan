@@ -10,11 +10,14 @@ use App\Entity\Etudiant;
 use App\Repository\EtudiantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use OpenApi\Annotations as OA;
+
 
 /**
  * @Route("/api/etudiant")
@@ -48,6 +51,7 @@ class EtudiantController extends AbstractController
 
     /**
      * @Route("/", name="get_etudiants", methods={"GET"})
+     * @OA\Tag(name="Etudiant")
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
@@ -62,6 +66,7 @@ class EtudiantController extends AbstractController
 
     /**
      * @Route("/{id}", name="get_etudiant", methods={"GET"})
+     * @OA\Tag(name="Etudiant")
      * @param int $id
      * @param SerializerInterface $serializer
      * @return JsonResponse
@@ -73,7 +78,7 @@ class EtudiantController extends AbstractController
         if(!$etudiant instanceof Etudiant) {
             throw new NotFoundHttpException('Etudiant introuvable');
         }
-        $context = SerializationContext::create()->setGroups(['etudiant', 'etudiant_note', 'note']);
+        $context = SerializationContext::create()->setGroups(['etudiant', 'etudiant_note', 'note', 'note_matiere', 'matiere']);
         $etudiant = $serializer->serialize($etudiant, 'json', $context);
 
         return JsonResponse::fromJsonString($etudiant, 200);
@@ -81,6 +86,11 @@ class EtudiantController extends AbstractController
 
     /**
      * @Route("/", name="add_etudiant", methods={"POST"})
+     * @OA\Tag(name="Etudiant")
+     * @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(ref=@Model(type=Etudiant::class, groups={"etudiant"}))
+     * ))
      * @param Request $request
      * @return JsonResponse
      * @throws \Exception
@@ -109,6 +119,7 @@ class EtudiantController extends AbstractController
 
     /**
      * @Route("/{id}", name="remove_etudiant_by_id", methods={"DELETE"})
+     * @OA\Tag(name="Etudiant")
      * @param $id
      * @return JsonResponse
      */
@@ -128,6 +139,11 @@ class EtudiantController extends AbstractController
 
     /**
      * @Route("/{id}", name="update_etudiant_by_id", methods={"PUT"})
+     * @OA\Tag(name="Etudiant")
+     * @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(ref=@Model(type=Etudiant::class, groups={"etudiant"}))
+     * ))
      * @param int $id
      * @param Request $request
      * @return JsonResponse

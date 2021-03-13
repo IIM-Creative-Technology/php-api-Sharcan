@@ -28,14 +28,14 @@ class Note
 
     /**
      * @Serializer\Groups({"note_etudiant"})
-     * @ORM\ManyToOne(targetEntity=Etudiant::class, inversedBy="notes")
+     * @ORM\ManyToOne(targetEntity=Etudiant::class, inversedBy="notes", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $etudiant;
 
     /**
      * @Serializer\Groups({"note_matiere"})
-     * @ORM\ManyToOne(targetEntity=Matiere::class, inversedBy="notes")
+     * @ORM\ManyToOne(targetEntity=Matiere::class, inversedBy="notes", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $matiere;

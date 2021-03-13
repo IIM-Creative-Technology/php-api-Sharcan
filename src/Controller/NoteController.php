@@ -9,7 +9,7 @@ use App\Repository\NoteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
 use Exception;
-use http\Exception\InvalidArgumentException;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +17,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\SerializationContext;
+use OpenApi\Annotations as OA;
+
 
 /**
  * @Route("/api/note")
@@ -45,6 +47,7 @@ class NoteController extends AbstractController
 
     /**
      * @Route("/", name="get_note", methods={"GET"})
+     * @OA\Tag(name="Note")
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
@@ -60,6 +63,7 @@ class NoteController extends AbstractController
 
     /**
      * @Route("/{id}", name="get_note_by_id", methods={"GET"})
+     * @OA\Tag(name="Note")
      * @param int $id
      * @param SerializerInterface $serializer
      * @return JsonResponse
@@ -76,6 +80,11 @@ class NoteController extends AbstractController
 
     /**
      * @Route("/", name="add_note", methods={"POST"})
+     * @OA\Tag(name="Note")
+     * @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(ref=@Model(type=Note::class, groups={"note"}))
+     * ))
      * @param Request $request
      * @return JsonResponse
      * @throws Exception
@@ -108,6 +117,11 @@ class NoteController extends AbstractController
 
     /**
      * @Route("/{id}", name="update_note_by_id", methods={"PUT"})
+     * @OA\Tag(name="Note")
+     * @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(ref=@Model(type=Note::class, groups={"note"}))
+     * ))
      * @param int $id
      * @param Request $request
      * @return JsonResponse
@@ -143,6 +157,7 @@ class NoteController extends AbstractController
 
     /**
      * @Route("/{id}", name="remove_note_by_id", methods={"DELETE"})
+     * @OA\Tag(name="Note")
      * @param int $id
      * @return JsonResponse
      */

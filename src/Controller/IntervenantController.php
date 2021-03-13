@@ -9,11 +9,14 @@ use App\Repository\IntervenantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
 use Exception;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use OpenApi\Annotations as OA;
+
 
 
 /**
@@ -48,6 +51,7 @@ class IntervenantController extends AbstractController
 
     /**
      * @Route("/", name="get_intervenant", methods={"GET"})
+     * @OA\Tag(name="Intervenant")
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
@@ -62,6 +66,7 @@ class IntervenantController extends AbstractController
 
     /**
      * @Route("/{id}", name="get_intervenant_by_id", methods={"GET"})
+     * @OA\Tag(name="Intervenant")
      * @param int $id
      * @param SerializerInterface $serializer
      * @return JsonResponse
@@ -83,6 +88,11 @@ class IntervenantController extends AbstractController
 
     /**
      * @Route("/", name="add_intervenant", methods={"POST"})
+     * @OA\Tag(name="Intervenant")
+     * @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(ref=@Model(type=Intervenant::class, groups={"intervenant"}))
+     * ))
      * @param Request $request
      * @return JsonResponse
      * @throws Exception
@@ -103,6 +113,11 @@ class IntervenantController extends AbstractController
 
     /**
      * @Route("/{id}", name="update_intervenant_by_id", methods={"PUT"})
+     * @OA\Tag(name="Intervenant")
+     * @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(ref=@Model(type=Intervenant::class, groups={"intervenant"}))
+     * ))
      * @param Request $request
      * @param int $id
      * @return JsonResponse
@@ -129,6 +144,7 @@ class IntervenantController extends AbstractController
 
     /**
      * @Route("/{id}", name="remove_intervenant_by_id", methods={"DELETE"})
+     * @OA\Tag(name="Intervenant")
      * @param $id
      * @return JsonResponse
      */

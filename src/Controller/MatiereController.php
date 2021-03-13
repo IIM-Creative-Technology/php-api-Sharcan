@@ -11,11 +11,14 @@ use App\Entity\Matiere;
 use App\Repository\MatiereRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use OpenApi\Annotations as OA;
+
 
 /**
  * @Route("/api/matiere")
@@ -45,6 +48,7 @@ class MatiereController extends AbstractController
 
     /**
      * @Route("/", name="get_matiere", methods={"GET"})
+     * @OA\Tag(name="Matiere")
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
@@ -59,6 +63,7 @@ class MatiereController extends AbstractController
 
     /**
      * @Route("/{id}", name="get_matiere_by_id", methods={"GET"})
+     * @OA\Tag(name="Matiere")
      * @param int $id
      * @param SerializerInterface $serializer
      * @return JsonResponse
@@ -77,6 +82,11 @@ class MatiereController extends AbstractController
 
     /**
      * @Route("/", name="add_matiere", methods={"POST"})
+     * @OA\Tag(name="Matiere")
+     * @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(ref=@Model(type=Matiere::class, groups={"matiere"}))
+     * ))
      * @param Request $request
      * @throws \Exception
      */
@@ -117,6 +127,11 @@ class MatiereController extends AbstractController
 
     /**
      * @Route("/{id}", name="update_matiere_by_id", methods={"PUT"})
+     * @OA\Tag(name="Matiere")
+     * @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(ref=@Model(type=Matiere::class, groups={"matiere"}))
+     * ))
      * @param int $id
      * @param Request $request
      * @return JsonResponse
@@ -153,6 +168,7 @@ class MatiereController extends AbstractController
 
     /**
      * @Route("/{id}", name="delete_matiere_by_id", methods={"DELETE"})
+     * @OA\Tag(name="Matiere")
      * @param int $id
      * @return JsonResponse
      */

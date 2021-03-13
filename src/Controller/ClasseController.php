@@ -4,7 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Classe;
 use App\Form\ClasseType;
+use App\Repository\ClasseRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectRepository;
+use Exception;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,6 +16,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 
 /**
  * @Route("/api/classe")
@@ -26,7 +32,7 @@ class ClasseController extends BaseController
     private $entityManager;
 
     /**
-     * @var \App\Repository\ClasseRepository|\Doctrine\Persistence\ObjectRepository
+     * @var ClasseRepository|ObjectRepository
      */
     private $classeRepository;
 
@@ -42,6 +48,12 @@ class ClasseController extends BaseController
 
     /**
      * @Route("/", name="get_classes", methods={"GET"})
+     * @OA\Tag(name="Classe")
+     * @OA\Response(
+     *     response="200",
+     *     description="Classe response",
+     *     @OA\JsonContent(ref=@Model(type=Classe::class))
+     * )
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
@@ -56,6 +68,7 @@ class ClasseController extends BaseController
 
     /**
      * @Route("/{id}", name="get_classe_by_id", methods={"GET"})
+     * @OA\Tag(name="Classe")
      * @param int $id
      * @return JsonResponse
      */
@@ -74,6 +87,10 @@ class ClasseController extends BaseController
 
     /**
      * @Route("/{id}/etudiant", name="get_classe_by_id_with_student", methods={"GET"})
+     * @OA\Tag(name="Classe")
+     * @param int $id
+     * @param SerializerInterface $serializer
+     * @return Response
      */
     public function getClasseWithEtudiant(int $id, serializerInterface $serializer): Response
     {
@@ -89,10 +106,19 @@ class ClasseController extends BaseController
 
     /**
      * @Route("/", name="add_classe", methods={"POST"})
+     * @OA\Tag(name="Classe")
+     * @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(ref=@Model(type=Classe::class, groups={"classe"}))
+     * )
      * @param Request $request
+     * @return JsonResponse
+     * @throws Exception
      */
-    public function addClasse(Request $request)
+    public function addClasse(Request $request): JsonResponse
     {
+        var_dump($request->request->all());
+        die;
         $classe = new Classe();
 
         $classe->setName($request->request->get('name'));
@@ -106,6 +132,7 @@ class ClasseController extends BaseController
 
     /**
      * @Route("/{id}", name="remove_classe_by_id", methods={"DELETE"})
+     * @OA\Tag(name="Classe")
      * @param $id
      * @return JsonResponse
      */
@@ -124,10 +151,15 @@ class ClasseController extends BaseController
 
     /**
      * @Route("/{id}", name="update_classe_by_id", methods={"PUT"})
+     * @OA\Tag(name="Classe")
+     * @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(ref=@Model(type=Classe::class, groups={"classe"}))
+     * )
      * @param $id
      * @param Request $request
      * @return JsonResponse
-     * @throws \Exception
+     * @throws Exception
      */
     public function updateClasse(int $id, Request $request) {
         $classe = $this->classeRepository->find($id);
