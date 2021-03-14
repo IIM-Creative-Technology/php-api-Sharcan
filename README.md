@@ -76,7 +76,7 @@ Indiquer le même mot de passe.
 
 Retourner dans le fichier `.env.local` et mettre le mot de passe indiquer avant sur la ligne **JWT_PASSPHRASE**
 
-##Lancement
+## Lancement
 Le projet est enfin prêt à être lancé:
 ```bash
 symfony server:start
