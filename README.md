@@ -89,6 +89,8 @@ symfony server:start
 Dans un premier temps, il est possible de se rendre à l'adresse suivante pour avoir accès à toutes les routes disponibles :  
 [http://localhost:8000/api/doc](http://localhost:8000/api/doc)
 
+*NB:* Il est malheureusement impossible d'ajouter ou de modifier une entité via l'API Doc (Impossible de configurer le PhpDoc pour le permettre).
+
 Dans un second temps, il est possible de retrouver toutes les requetes que l'on peut importer dans **Postman** dans le fichier `ldv-api-sharcan.postman_collection.json`.  
 
 ### Requetes disponibles
